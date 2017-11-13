@@ -1,0 +1,593 @@
+
+
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.2.5/cytoscape.js"></script>
+    <script src="https://cdn.rawgit.com/cpettitt/dagre/v0.7.4/dist/dagre.min.js"></script>
+    <script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-dagre/1.5.0/cytoscape-dagre.js"></script>
+    <style>
+        #cy {
+            width: 33%;
+            height: 100%;
+            position: absolute;
+            top: 20px;
+            left: 0px;
+        }
+      #editor { 
+            width: 33%;
+            height: 100%;
+            position: absolute;
+            top: 20px;
+            right: 33%;
+      }
+      #output { 
+            width: 33%;
+            height: 100%;
+            position: absolute;
+            top: 20px;
+            right: 0px;
+      }
+    </style>
+
+    <script src="ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+    <script src="biwascheme.js" type="text/javascript" charset="utf-8"></script>
+    <script src="raphael.min.js" type="text/javascript" charset="utf-8"></script>
+  </head>
+
+  <body>
+    <button id="runButton" onclick="run()">Run</button>
+    <div id="cy"></div>
+    <div id="editor"></div>
+    <div id="output"> </div>
+
+    <script>
+
+
+
+      function getParameterByName(name, url) {
+          if (!url) url = window.location.href;
+          name = name.replace(/[\[\]]/g, "\\$&");
+          var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+              results = regex.exec(url);
+          if (!results) return null;
+          if (!results[2]) return '';
+          return decodeURIComponent(results[2].replace(/\+/g, " "));
+      }
+
+var definitions = []
+
+function flatten(array, mutable) {
+    var toString = Object.prototype.toString;
+    var arrayTypeStr = '[object Array]';
+    
+    var result = [];
+    var nodes = (mutable && array) || array.slice();
+    var node;
+
+    if (!array.length) {
+        return result;
+    }
+
+    node = nodes.pop();
+    
+    do {
+        if (toString.call(node) === arrayTypeStr) {
+            nodes.push.apply(nodes, node);
+        } else {
+            result.push(node);
+        }
+    } while (nodes.length && (node = nodes.pop()) !== undefined);
+
+    result.reverse(); // we reverse result to restore the original order
+    return result;
+}
+
+ var tokenize = function(input) {
+     return input.replace(/\(/g, ' ( ')
+                 .replace(/\)/g, ' ) ')
+                 .trim()
+                 .split(/\s+/);
+   };
+
+
+var parenthesize = function(input, list) {
+     if (list === undefined) {
+       return parenthesize(input, []);
+     } else {
+       var token = input.shift();
+      if (token === undefined) {
+         return list.pop();
+       } else if (token === "(") {
+         list.push(parenthesize(input, []));
+        return parenthesize(input, list);
+      } else if (token === ")") {
+        return list;
+      } else {
+        return parenthesize(input, list.concat(idify(categorize(token))));
+      }
+    }
+  };
+
+ var id = 0
+
+ var idify = function(thing){
+   thing.id = "n" + (id++)
+   return thing
+ }
+
+ var categorize = function(input) {
+     if (!isNaN(parseFloat(input))) {
+       return { type:'literal', value: parseFloat(input) };
+     } else if (input[0] === '"' && input.slice(-1) === '"') {
+       return { type:'literal', value: input.slice(1, -1) };
+     } else {
+       return { type:'identifier', value: input };
+     }
+   };
+
+var parse = function(input) {
+     return parenthesize(tokenize(input));
+   };
+
+
+
+
+function render(code){
+  definitions = []
+
+  var cy = window.cy = cytoscape({
+    container: document.getElementById('cy'),
+
+    boxSelectionEnabled: false,
+    autounselectify: true,
+
+    layout: {
+      name: 'dagre',
+      transform: function( node, pos ){ return {x: pos.y, y: pos.x}; }
+    },
+
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'content': 'data(value)',
+          'text-valign': 'center',
+          'text-outline-width': 2,
+          'background-color': 'data(backgroundColor)',
+          'color': '#fff',
+          'shape': 'data(shape)'
+        }
+      },
+
+      {
+        selector: '$node > node',
+        css: {
+          'padding-top': '10px',
+          'padding-left': '10px',
+          'padding-bottom': '10px',
+          'padding-right': '10px',
+          'text-valign': 'top',
+          'text-halign': 'center',
+          'background-color': '#bbb'
+        }
+      },
+
+      {
+        selector: 'edge',
+        style: {
+          "label": "data(label)",
+          'curve-style': 'bezier',
+          'width': 4,
+          'target-arrow-shape': 'triangle',
+          'line-color': '#111',
+          'text-outline-width': 2,
+          'color': '#fff',
+          'target-arrow-color': '#111'
+        }
+      }
+    ],
+    elements: elementsFromScheme("(prog "+code+")"),
+  });
+}
+
+
+function makeNodes(lisp){
+  var ret = flatten(lisp).map(function(n){
+        n.shape = n.type == "identifier" ? "triangle" : "square"
+        n.backgroundColor = "#11479e"
+
+        if(n.variable){
+          n.shape = "ellipse"
+          n.backgroundColor = "red"
+        }
+
+        if(n.value == "if"){
+          n.shape = "concavehexagon"
+          n.backgroundColor = "purple"
+        }
+
+        if(definitions.map(function(d){return d.header[0].value}).indexOf(n.value) > -1){
+          n.shape = "square"
+          n.backgroundColor = "gray"
+        }
+  
+        return {data: n} 
+      }).filter(function(n){return n.data.value != "prog"})
+
+
+  return ret
+}
+
+
+function makeEdges(lisp, edges, define){
+  var first = lisp[0]
+
+  if(define)
+    first.parent = define.id
+
+  if(first.value == "define"){
+    define = first
+    first.value = lisp[1][0].value
+    first.header = lisp[1]
+    definitions.push(first)
+    lisp.splice(1,1)
+  }
+
+
+
+
+  for(var i = 1; i < lisp.length; i++){
+    var current = lisp[i]
+
+    if(define){
+      current.parent = define.id
+    }
+
+    if(current.length === undefined){ //Not an array
+      if(first != define && first.value != "prog"){
+        var edge = { data: { target: first.id, source: current.id, label: "" } }
+        var def = definitions.filter(function(d){return d.header[0].value == first.value})[0]
+        if(def){
+          edge.data.label = def.header[i].value
+        }
+        edges.push(edge)
+      }
+
+      if(define && define.header.map(function(l){return l.value}).indexOf(current.value) > -1){  //Found a parameter reference...
+        current.variable = true
+      }
+    } else {
+      makeEdges(current, edges, define)
+
+      if(first != define && first.value != "prog"){
+        var edge = { data: { target: first.id, source: current[0].id, label: "" } }
+        var def = definitions.filter(function(d){return d.header[0].value == first.value})[0]
+        if(def){
+          edge.data.label = def.header[i].value
+        }
+        edges.push(edge)
+      }
+    }
+  }
+
+  return edges
+}
+
+
+function elementsFromScheme(expr){
+ 
+  var lisp = parse(expr)
+
+
+
+  return {
+    edges: makeEdges(lisp, []),
+    nodes: makeNodes(lisp),
+  }
+  
+}
+
+    </script>
+
+
+    <script>
+      var onError = function(e){ console.error(e); }
+      var biwa = new BiwaScheme.Interpreter(onError)
+
+      function run(){
+          paper.clear()
+          paper.setStart()
+
+          biwa.evaluate(editor.getValue(), function(result) {
+            console.log("RUN",result.getBBox())
+        
+            toKill.map(function(k){k.remove()}) 
+
+            result.transform("t"+(-result.getBBox().x + 10)+","+(-result.getBBox().y - result.getBBox().height/2 + window.innerHeight/2) + "...")
+
+            paper.setFinish()
+          });
+      }
+
+      BiwaScheme.define_libfunc("circle", 3, 3, function(ar){
+        BiwaScheme.assert_string(ar[1]);
+        BiwaScheme.assert_string(ar[2]);
+
+        var circle = paper.circle(0, 0, ar[0])
+        circle.attr({stroke: "none", "stroke-width":5})
+        circle.attr(ar[1] != "outline" ? "fill" : "stroke", ar[2]);
+
+        return circle
+      });
+
+      BiwaScheme.define_libfunc("star", 3, 3, function(ar){
+        BiwaScheme.assert_string(ar[1]);
+        BiwaScheme.assert_string(ar[2]);
+
+           
+        var star = concaveNGon(0, 0, 5, 2, ar[0])
+        star.attr({stroke: "none", "stroke-width":5})
+        star.attr(ar[1] != "outline" ? "fill" : "stroke", ar[2]);
+
+        return star
+      });
+      
+      BiwaScheme.define_libfunc("pentagon", 3, 3, function(ar){
+        BiwaScheme.assert_string(ar[1]);
+        BiwaScheme.assert_string(ar[2]);
+
+        var pentagon = concaveNGon(0,0,5,1, ar[0])
+        pentagon.attr({stroke: "none", "stroke-width":5})
+        pentagon.attr(ar[1] != "outline" ? "fill" : "stroke", ar[2]);
+
+        return pentagon
+      });
+
+      BiwaScheme.define_libfunc("hexagon", 3, 3, function(ar){
+        BiwaScheme.assert_string(ar[1]);
+        BiwaScheme.assert_string(ar[2]);
+
+        var hexagon = concaveNGon(0,0,6,1, ar[0])
+        hexagon.attr({stroke: "none", "stroke-width":5})
+        hexagon.attr(ar[1] != "outline" ? "fill" : "stroke", ar[2]);
+
+        return hexagon
+      });
+
+      BiwaScheme.define_libfunc("heptagon", 3, 3, function(ar){
+        BiwaScheme.assert_string(ar[1]);
+        BiwaScheme.assert_string(ar[2]);
+
+        var heptagon = concaveNGon(0,0,7,1, ar[0])
+        heptagon.attr({stroke: "none", "stroke-width":5})
+        heptagon.attr(ar[1] != "outline" ? "fill" : "stroke", ar[2]);
+
+        return heptagon
+      });
+
+      BiwaScheme.define_libfunc("octagon", 3, 3, function(ar){
+        BiwaScheme.assert_string(ar[1]);
+        BiwaScheme.assert_string(ar[2]);
+
+        var octagon = concaveNGon(0,0,8,1, ar[0])
+        octagon.attr({stroke: "none", "stroke-width":5})
+        octagon.attr(ar[1] != "outline" ? "fill" : "stroke", ar[2]);
+
+        return octagon
+      });
+
+      BiwaScheme.define_libfunc("regular-polygon", 4, 4, function(ar){
+        BiwaScheme.assert_integer(ar[1]);
+        BiwaScheme.assert_string(ar[2]);
+        BiwaScheme.assert_string(ar[3]);
+
+           
+        var star = concaveNGon(0, 0, ar[1], 1, ar[0])
+        star.attr({stroke: "none", "stroke-width":5})
+        star.attr(ar[2] != "outline" ? "fill" : "stroke", ar[3]);
+
+        return star
+      });
+
+      BiwaScheme.define_libfunc("star-polygon", 4, 4, function(ar){
+        BiwaScheme.assert_integer(ar[1]);
+        BiwaScheme.assert_string(ar[2]);
+        BiwaScheme.assert_string(ar[3]);
+
+           
+        var star = concaveNGon(0, 0, ar[1], 2, ar[0])
+        star.attr({stroke: "none", "stroke-width":5})
+        star.attr(ar[2] != "outline" ? "fill" : "stroke", ar[3]);
+
+        return star
+      });
+
+      BiwaScheme.define_libfunc("image-width", 1, 1, function(ar){
+        toKill.push(ar[0])
+        return ar[0].getBBox().width
+      });
+
+      BiwaScheme.define_libfunc("image-height", 1, 1, function(ar){
+        toKill.push(ar[0])
+        return ar[0].getBBox().height
+      });
+      
+      BiwaScheme.define_libfunc("triangle", 3, 3, function(ar){
+        BiwaScheme.assert_string(ar[1]);
+        BiwaScheme.assert_string(ar[2]);
+        
+           
+        var triangle = concaveNGon(0, 0, 3, 1, ar[0])
+        triangle.attr({stroke: "none", "stroke-width":5})
+        triangle.attr(ar[1] != "outline" ? "fill" : "stroke", ar[2]);
+
+        return triangle
+      });
+
+      BiwaScheme.define_libfunc("text", 3, 3, function(ar){
+        BiwaScheme.assert_string(ar[0]);
+        BiwaScheme.assert_integer(ar[1]);
+        BiwaScheme.assert_string(ar[2]);
+
+        var text = paper.text(0, 0, ar[0]).attr({ fill: ar[2], "font-size": ar[1]});
+
+        return text
+      });
+
+      BiwaScheme.define_libfunc("square", 3, 3, function(ar){
+        BiwaScheme.assert_string(ar[1]);
+        BiwaScheme.assert_string(ar[2]);
+
+        //var square = paper.rect(-ar[0]/2, -ar[0]/2, ar[0], ar[0]);
+        var square = concaveNGon(0, 0, 4, 1, ar[0])
+        square.attr({stroke: "none", "stroke-width":5})
+        square.attr(ar[1] != "outline" ? "fill" : "stroke", ar[2]);
+
+
+        return square
+      });
+
+      BiwaScheme.define_libfunc("overlay", 2, 2, function(ar){
+        cloneElements(ar)
+
+        var set = paper.set()
+
+
+        ar.map(function(a){
+          set.push(a)
+        })
+
+        ar[0].toFront()
+
+        return set
+      });
+
+      BiwaScheme.define_libfunc("beside", 2, 2, function(ar){
+        cloneElements(ar)
+
+        var set = paper.set()
+
+        ar[1].transform("t"+ar[0].getBBox().width/2+"," +0 +"...")
+        ar[0].transform("t"+(-ar[1].getBBox().width/2)+","+ 0+"...")
+
+        ar.map(function(a){
+          set.push(a)
+        })
+
+        return set
+      });
+
+      BiwaScheme.define_libfunc("above", 2, 2, function(ar){
+        cloneElements(ar)
+
+        var set = paper.set()
+
+        ar[1].transform("t0,"+ar[0].getBBox().height/2+"...")
+        ar[0].transform("t0,"+(-ar[1].getBBox().height/2)+"...")
+
+        ar.map(function(a){
+          set.push(a)
+        })
+
+        return set
+      });
+
+      var toKill = []
+      function cloneElements(ar){
+        for(var i = 0; i < ar.length; i++){
+          var old = ar[i]
+
+          ar[i] = old.clone()
+
+          toKill.push(old)
+        } 
+
+      }
+
+      var paper = Raphael(document.getElementById("output"), "100%", "100%");
+    </script>
+
+    <script>
+        var editor = ace.edit("editor");
+        editor.setTheme("ace/theme/monokai");
+        editor.getSession().setMode("ace/mode/scheme");
+        editor.getSession().on('change', function() {
+          console.log("CODE", editor.getValue())
+          
+          try{render(editor.getValue())} catch(e) {
+            console.log(e)
+          }
+        });
+
+        var startingValue = getParameterByName("startingValue")
+        var hideScheme = getParameterByName("hideScheme")
+        var hideAnswer = getParameterByName("hideAnswer")
+        var hideDiagram = getParameterByName("hideDiagram")
+
+         
+        if(hideScheme == "true"){
+          document.getElementById("runButton").style.display="none"
+          document.getElementById("editor").style.display="none"
+          document.getElementById("cy").style.width="70%"
+          document.getElementById("cy").style.top="0px"
+          document.getElementById("output").style.width="30%"
+          document.getElementById("output").style.top="0px"
+        }
+
+
+        if(hideAnswer == "true"){
+          //document.getElementById("output").style.backgroundColor = "gray"
+        }
+
+        if(hideDiagram == "true"){
+          document.getElementById("cy").style.display="none"
+          document.getElementById("output").style.width = "100%"
+        }
+
+        if(startingValue){
+          editor.setValue(startingValue)
+
+          if(hideAnswer != "true")
+            run()
+        }
+
+
+        function concaveNGon(x,y,n,step,r){
+            //r = r /2
+            // start at the top point
+            var path = "M" + x + "," + (y - r);
+            
+            for (var c = 0; c < (n+1); c += 1) {
+                var angle = c * (step * (360/n)),
+                    rx = x + r * Math.cos(angle * Math.PI / 180),
+                    ry = y + r * Math.sin(angle * Math.PI / 180);
+
+                path += (c === 0 ? "M" : "L") + rx + "," + ry;
+            }   
+         
+            //We just guessed at this math here.  Don't know much about geometry
+            var ret = paper.path(path);
+            var desiredWidth = /*WTF??*/ (n/3)*r
+            var actualWidth  = ret.getBBox().width
+
+            ret.scale(desiredWidth/actualWidth)
+
+
+            if(n % 2 == 1)  
+              ret.translate(((-r/(n))+ 2), 0 )
+          
+            if(n == 4)
+              ret.rotate(45) //Dumb square hack
+            else 
+              ret.rotate(-90)
+
+
+
+
+            console.log("Polygon bbox",ret.getBBox())
+
+            return ret
+        }
+    </script>
+  </body>
+</html>
