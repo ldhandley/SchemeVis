@@ -53,7 +53,7 @@
 
   <div id="admin_answers">
     <h3>Answers</h3>
-    <input type="text" id="admin_answer1" disabled></input>
+    <input type="text" id="admin_answer1" ></input>
     <input type="text" id="admin_answer2"></input>
     <input type="text" id="admin_answer3"></input>
     <input type="text" id="admin_answer4"></input>
@@ -75,9 +75,14 @@
       admin_answer2: document.getElementById("admin_answer2").value,
       admin_answer3: document.getElementById("admin_answer3").value,
       admin_answer4: document.getElementById("admin_answer4").value,
+      correct_answer: document.getElementById("right_answer").innerHTML 
     }
 
     localStorage.setItem('stored_question'+questionNumber, JSON.stringify(data))
+
+
+    
+    document.getElementById("export").innerHTML = JSON.stringify(data)
 
   }
   function restoreDB(){
@@ -103,14 +108,14 @@
   }
 
   function generate(){
-    saveDB()
 
     generateQuestion(1)
     generateQuestion(2)
     generateQuestion(3)
     generateQuestion(4)
 
-    document.getElementById("admin_answer1").value = document.getElementById("admin_question4").value
+    if(document.getElementById("admin_answer1").value == "")
+      document.getElementById("admin_answer1").value = document.getElementById("admin_question4").value
 
 
     var a = [1,2,3,4]
@@ -138,6 +143,8 @@
     generateAnswer(a[1], "B")
     generateAnswer(a[2], "C")
     generateAnswer(a[3], "D")
+
+    saveDB()
   } 
 
   function generateQuestion(num){
@@ -147,7 +154,7 @@
   }
 
   function generateAnswer(num,letter){
-    var encodedScheme = encodeURIComponent('(overlay (text "'+letter+'" 24 "black")' + document.getElementById("admin_answer"+num).value + ')')
+    var encodedScheme = encodeURIComponent('(above (text "'+letter+'" 24 "black")' + document.getElementById("admin_answer"+num).value + ')')
 
     var answerUrl = "index.html?startingValue="+encodedScheme+"&hideScheme=true&hideDiagram=true"
     document.getElementById("answer" + letter).src = answerUrl
@@ -191,6 +198,7 @@
   </div>
 </div>
 
-<script>
+<div style="clear:both"/>
+<div id="export">
    
-</script>
+</div>

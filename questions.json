@@ -1,0 +1,75 @@
+{questions: [
+  //1
+{"admin_question1":"(circle 40 \"solid\" \"red\")","admin_question2":"(circle 40 \"solid\" \"yellow\")","admin_question3":"(circle 40 \"solid\" \"blue\")","admin_question4":"(circle 40 \"solid\" \"green\")","admin_answer1":"(circle 40 \"solid\" \"green\")","admin_answer2":"(circle 40 \"solid\" \"orange\")","admin_answer3":"(circle 40 \"solid\" \"purple\")","admin_answer4":"(circle 40 \"solid\" \"yellow\")","correct_answer":"D"},
+  //2
+{"admin_question1":"(circle 40 \"solid\" \"red\")","admin_question2":"(circle 20 \"solid\" \"red\")","admin_question3":"(circle 10 \"solid\" \"red\")","admin_question4":"(circle 80 \"solid\" \"red\")","admin_answer1":"(circle 80 \"solid\" \"red\")","admin_answer2":"(circle 30 \"solid\" \"red\")","admin_answer3":"(circle 40 \"solid\" \"red\")","admin_answer4":"(circle 15 \"solid\" \"red\")","correct_answer":"C"},
+  //3
+{"admin_question1":"(circle 40 \"solid\" \"red\")","admin_question2":"(circle 40 \"outline\" \"red\")","admin_question3":"(circle 20 \"outline\" \"red\")","admin_question4":"(circle 20 \"solid\" \"red\")","admin_answer1":"(circle 20 \"solid\" \"red\")","admin_answer2":"(circle 60 \"solid\" \"red\")","admin_answer3":"(circle 25 \"outline\" \"red\")","admin_answer4":"(circle 80 \"outline\" \"red\")","correct_answer":"C"},
+  //4
+{"admin_question1":"(circle 50 \"solid\" \"red\")","admin_question2":"(square 50 \"solid\" \"red\")","admin_question3":"(star 50 \"solid\" \"red\")","admin_question4":"(triangle 50 \"solid\" \"red\")","admin_answer1":"(triangle 50 \"solid\" \"red\")","admin_answer2":"(square 50 \"solid\" \"red\")","admin_answer3":"(star 50 \"solid\" \"red\")","admin_answer4":"(octagon 50 \"solid\" \"red\")","correct_answer":"A"},
+  //5
+{"admin_question1":"(circle 25 \"solid\" \"yellow\")","admin_question2":"(triangle 50 \"solid\" \"orange\")","admin_question3":"(octagon 25 \"outline\" \"green\")","admin_question4":"(pentagon 50 \"outline\" \"blue\")","admin_answer1":"(pentagon 50 \"outline\" \"blue\")","admin_answer2":"(circle 25 \"solid\" \"red\")","admin_answer3":"(star 50 \"solid\" \"blue\")","admin_answer4":"(circle 50 \"solid\" \"yellow\")","correct_answer":"B"},
+  //6
+{"admin_question1":"(circle (+ 3 3) \"solid\" \"blue\")","admin_question2":"(circle (+ 20 20) \"solid\" \"blue\")","admin_question3":"(circle (+ 20 10) \"solid\" \"blue\")","admin_question4":"(circle (+ 10 15) \"solid\" \"blue\")","admin_answer1":"(circle (+ 10 15) \"solid\" \"blue\")","admin_answer2":"(circle 40 \"solid\" \"blue\")","admin_answer3":"(circle 10 \"solid\" \"blue\")","admin_answer4":"(circle 60 \"solid\" \"blue\")","correct_answer":"A"},
+  //7
+{"admin_question1":"(square (- 10 0) \"solid\" \"green\")","admin_question2":"(square (- 30 2) \"solid\" \"green\")","admin_question3":"(square (- 70 10) \"solid\" \"green\")","admin_question4":"(square (- 200 100) \"solid\" \"green\")","admin_answer1":"(square (- 200 100) \"solid\" \"green\")","admin_answer2":"(square 50 \"solid\" \"green\")","admin_answer3":"(square 30 \"solid\" \"green\")","admin_answer4":"(square 20 \"solid\" \"green\")","correct_answer":"A"},
+  //8
+{"admin_question1":"(beside (square 30 \"solid\" \"green\") (square 30 \"solid\" \"blue\"))","admin_question2":"(beside (square 30 \"solid\" \"yellow\") (square 30 \"solid\" \"orange\"))","admin_question3":"(beside (square 30 \"solid\" \"blue\") (square 30 \"solid\" \"green\"))","admin_question4":"(beside (square 30 \"solid\" \"red\") (square 30 \"solid\" \"purple\"))","admin_answer1":"(beside (square 30 \"solid\" \"red\") (square 30 \"solid\" \"purple\"))","admin_answer2":"(beside (square 40 \"solid\" \"red\") (square 40 \"solid\" \"green\"))","admin_answer3":"(beside (square 30 \"solid\" \"purple\") (square 30 \"solid\" \"red\"))","admin_answer4":"(beside (square 30 \"solid\" \"orange\") (square 30 \"solid\" \"purple\"))","correct_answer":"B"},
+  //9
+{"admin_question1":"(above (square 80 \"solid\" \"red\") (circle 40 \"solid\" \"red\"))","admin_question2":"(above (square 80 \"solid\" \"green\") (circle 40 \"solid\" \"blue\"))","admin_question3":"(above (circle 40 \"solid\" \"blue\") (square 80 \"solid\" \"green\"))","admin_question4":"(above (pentagon 40 \"solid\" \"purple\") (star 40 \"solid\" \"orange\"))","admin_answer1":"(above (pentagon 40 \"solid\" \"purple\") (star 40 \"solid\" \"orange\"))","admin_answer2":"(above (star 40 \"solid\" \"orange\") (star 40 \"solid\" \"purple\"))","admin_answer3":"(above (square 40 \"solid\" \"purple\") (circle 20 \"solid\" \"orange\"))","admin_answer4":"(above (star 40 \"solid\" \"orange\") (pentagon 40 \"solid\" \"purple\"))","correct_answer":"C"},
+  //10
+  {"admin_question1":"(square (- 40 2) \"solid\" \"green\")","admin_question2":"(square (* 40 2) \"solid\" \"green\")","admin_question3":"(square (+ 40 2) \"solid\" \"green\")","admin_question4":"(square (/ 40 2) \"solid\" \"green\")","admin_answer1":"(square (/ 40 2) \"solid\" \"green\")","admin_answer2":"(square (* 40 2) \"solid\" \"green\")","admin_answer3":"(square 40 \"solid\" \"green\")","admin_answer4":"(square 5 \"solid\" \"green\")","correct_answer":"C"},
+
+  //11
+  {"admin_question1":"(square (* 20 2) \"solid\" \"green\")","admin_question2":"(square (* 20 1) \"solid\" \"green\")","admin_question3":"(square (/ 20 4) \"solid\" \"green\")","admin_question4":"(square (- 20 5) \"solid\" \"green\")","admin_answer1":"(square (- 20 5) \"solid\" \"green\")","admin_answer2":"(square 25 \"solid\" \"green\")","admin_answer3":"(square 40 \"solid\" \"green\")","admin_answer4":"(square 50 \"solid\" \"green\")","correct_answer":"D"},
+
+  //12
+{"admin_question1":"(beside (square 20 \"solid\" \"orange\") (square (* 10 2) \"solid\" \"green\"))","admin_question2":"(beside (square 20 \"solid\" \"orange\") (square (* 10 3) \"solid\" \"green\"))","admin_question3":"(beside (square 20 \"solid\" \"orange\") (square (* 10 4) \"solid\" \"green\"))","admin_question4":"(beside (square 20 \"solid\" \"orange\") (square (- 10 5) \"solid\" \"green\"))","admin_answer1":"(beside (square 20 \"solid\" \"orange\") (square (- 10 5) \"solid\" \"green\"))","admin_answer2":"(beside (square 20 \"solid\" \"orange\") (square 10 \"solid\" \"green\"))","admin_answer3":"(beside (square 5 \"solid\" \"orange\") (square 30 \"solid\" \"green\"))","admin_answer4":"(beside (square 30 \"solid\" \"orange\") (square 30 \"solid\" \"green\"))","correct_answer":"D"},
+ 
+  //13
+  {"admin_question1":"(square (* (+ 5 5) 10) \"solid\" \"blue\")","admin_question2":"(square (+ (* 5 5) 10) \"solid\" \"blue\")","admin_question3":"(square (/ (* 5 5) 10) \"solid\" \"blue\")","admin_question4":"(square (- (* 5 5) 10) \"solid\" \"blue\")","admin_answer1":"(square (- (* 5 5) 10) \"solid\" \"blue\")","admin_answer2":"(square 90 \"solid\" \"blue\")","admin_answer3":"(square 50 \"solid\" \"blue\")","admin_answer4":"(square 30 \"solid\" \"blue\")","correct_answer":"C"},
+
+  //14
+  {"admin_question1":"(square (+ (+ 5 5) (+ 5 5)) \"solid\" \"red\")","admin_question2":"(square (+ (/ 5 5) (/ 5 5)) \"solid\" \"red\")","admin_question3":"(square (* (+ 5 5) (+ 5 5)) \"solid\" \"red\")","admin_question4":"(square (+ (- 5 5) (+ 5 5)) \"solid\" \"red\")","admin_answer1":"(square (+ (- 5 5) (+ 5 5)) \"solid\" \"red\")","admin_answer2":"(square 90 \"solid\" \"red\")","admin_answer3":"(square 25 \"solid\" \"red\")","admin_answer4":"(square 3 \"solid\" \"red\")","correct_answer":"B"},
+
+  //15
+  {"admin_question1":"(beside (pentagon 30 \"solid\" \"green\") (square 30 \"solid\" \"blue\"))","admin_question2":"(beside (pentagon 30 \"solid\" \"green\") (square (+ 15 15) \"solid\" \"blue\"))","admin_question3":"(beside (circle (+ 15 15) \"solid\" \"green\") (square (+ 15 15) \"solid\" \"blue\"))","admin_question4":"(beside (circle (- 40 10) \"solid\" \"purple\") (square 30 \"solid\" \"red\"))","admin_answer1":"(beside (circle (- 40 10) \"solid\" \"purple\") (square 30 \"solid\" \"red\"))","admin_answer2":"(beside (circle 15 \"solid\" \"red\") (square 30 \"solid\" \"purple\"))","admin_answer3":"(beside (circle 15 \"solid\" \"red\") (square 40 \"solid\" \"purple\"))","admin_answer4":"(beside (circle (- 40 10) \"solid\" \"red\") (square 30 \"solid\" \"purple\"))","correct_answer":"A"},
+
+  //16
+  {"admin_question1":"(define (mystery x) (square x \"solid\" \"purple\")) (mystery 50)","admin_question2":"(define (mystery x) (square x \"solid\" \"purple\")) (mystery 30)","admin_question3":"(define (mystery x) (square x \"solid\" \"purple\")) (mystery 70)","admin_question4":"(define (mystery x) (square x \"solid\" \"purple\")) (mystery 60)","admin_answer1":"(square 60 \"solid\" \"purple\")","admin_answer2":"(square 100 \"solid\" \"purple\")","admin_answer3":"(square 20 \"solid\" \"purple\")","admin_answer4":"(square 10 \"solid\" \"purple\")","correct_answer":"C"},
+
+  //17
+  {"admin_question1":"(define (mystery x) (circle 50 x \"red\")) (mystery \"outline\")","admin_question2":"(define (mystery x) (circle 10 x \"red\")) (mystery \"solid\")","admin_question3":"(define (mystery x) (circle 30 x \"red\")) (mystery \"outline\")","admin_question4":"(define (mystery x) (circle 70 x \"red\")) (mystery \"solid\")","admin_answer1":" (circle 70 \"solid\" \"red\")","admin_answer2":"(circle 50 \"solid\" \"red\")","admin_answer3":"(circle 70 \"outline\" \"red\")","admin_answer4":"(circle 50 \"outline\" \"red\")","correct_answer":"B"},
+
+  //18
+  {"admin_question1":"(define (mystery x) (square x \"solid\" \"purple\")) (mystery 50)","admin_question2":"(define (mystery x) (pentagon x \"solid\" \"orange\")) (mystery 50)","admin_question3":"(define (mystery x) (triangle x \"solid\" \"red\")) (mystery 50)","admin_question4":"(define (mystery x) (circle x \"solid\" \"green\")) (mystery 50)","admin_answer1":"(circle 50 \"solid\" \"green\")","admin_answer2":"(octagon 50 \"solid\" \"green\")","admin_answer3":"(hexagon 50 \"solid\" \"green\")","admin_answer4":"(star 50 \"solid\" \"green\")","correct_answer":"B"},
+
+
+
+  //21
+  {"admin_question1":"(define (mystery x) (circle 50 \"solid\" x)) (mystery \"red\")","admin_question2":"(define (mystery x) (circle 50 \"solid\" x)) (mystery \"orange\")","admin_question3":"(define (mystery x) (circle 50 \"solid\" x)) (mystery \"green\")","admin_question4":"(define (mystery x) (circle 50 \"solid\" x)) (mystery \"blue\")","admin_answer1":"(circle 50 \"solid\" \"blue\")","admin_answer2":"(circle 50 \"solid\" \"yellow\")","admin_answer3":"(circle 50 \"solid\" \"green\")","admin_answer4":"(circle 50 \"solid\" \"purple\")","correct_answer":"B"},
+
+
+   //Pass in "solid" vs "outline"
+
+   //Shape in function differs between hints
+
+   //Pass in output of math expression
+
+   //Function with a nested expression inside
+
+   //Calling a function twice (e.g. (beside mystery mystery))
+
+   //Function that returns a number
+
+   //Function with two+ params
+
+   //Two different functions mystery1 mystery2
+
+   //Function that calls another function
+      // And so on
+
+
+ 
+
+]}

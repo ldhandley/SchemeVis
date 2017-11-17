@@ -194,6 +194,10 @@ function render(code){
 function makeNodes(lisp){
   var ret = flatten(lisp).map(function(n){
         n.shape = n.type == "identifier" ? "triangle" : "square"
+
+        if(n.type == "literal" && !parseInt(n.value))
+          n.value = "\"" + n.value + "\"" 
+
         n.backgroundColor = "#11479e"
 
         if(n.variable){
