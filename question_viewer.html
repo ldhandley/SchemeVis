@@ -1,0 +1,250 @@
+
+<style>
+  body,html{
+    padding: 0px;
+    margin: 0px;
+  }
+
+
+  .answer {
+    width: 200px;
+    height: 200px;
+    float: left;
+    margin-right: 10px;
+  }
+  .answer iframe{
+    border: none; 
+    width: 200px;
+    height: 200px;
+    float: left;
+  }
+
+  .questions iframe{
+    border: 1px solid black; 
+    width: 450px;
+    height: 340px;
+    margin: 2px;
+    display: block;
+    float: left;
+  }
+
+  .questions{
+    float:left;
+    width: 70%;
+  }
+  .answers{
+    float:left;
+    width: 30%;
+  }
+</style>
+
+<div>
+  <div>
+    <h3>Data set</h3>
+    <input type="text" id="import" onchange="imp()"></input>
+    <h3>Question Number</h3>
+    <input type="text" id="question_number" onkeyup="restoreDB()"></input>
+    <span id="right_answer">???</span>
+  </div>
+  <div id="admin_questions">
+    <h3>Questions</h3>
+    <input type="text" id="admin_question1"></input>
+    <input type="text" id="admin_question2"></input>
+    <input type="text" id="admin_question3"></input>
+    <input type="text" id="admin_question4"></input>
+  </div>
+
+  <div id="admin_answers">
+    <h3>Answers</h3>
+    <input type="text" id="admin_answer1" ></input>
+    <input type="text" id="admin_answer2"></input>
+    <input type="text" id="admin_answer3"></input>
+    <input type="text" id="admin_answer4"></input>
+  </div>
+  <button id="generate" onclick="generate()">Generate</button>
+</div>
+
+
+<script>
+
+  var data_set; 
+  
+
+  function imp(){
+    data_set = JSON.parse(document.getElementById("import").value)
+  }
+
+  function saveDB(){
+    var questionNumber = parseInt(document.getElementById("question_number").value)
+
+    var data = {
+      admin_question1: document.getElementById("admin_question1").value,
+      admin_question2: document.getElementById("admin_question2").value,
+      admin_question3: document.getElementById("admin_question3").value,
+      admin_question4: document.getElementById("admin_question4").value,
+      admin_answer1: document.getElementById("admin_answer1").value,
+      admin_answer2: document.getElementById("admin_answer2").value,
+      admin_answer3: document.getElementById("admin_answer3").value,
+      admin_answer4: document.getElementById("admin_answer4").value
+    }
+
+    data_set[questionNumber-1] = data
+
+    recalculateAnswers(data_set)
+
+    document.getElementById("export").innerHTML = JSON.stringify(data_set)
+  }
+
+
+  function recalculateAnswers(data_set){
+
+    data_set.forEach(function(d,i){
+      var hash = JSON.stringify(d).hashCode()
+      console.log(i+1, hash)
+      var a = [1,2,3,4]
+      var rightLetter = rightLetterFor( hash, a)
+      d.correct_answer = rightLetter
+      d.shuffle = a
+    })
+ 
+  }
+
+
+  function restoreDB(){
+    var questionNumber = parseInt(document.getElementById("question_number").value)
+    try{
+      var stored_data = data_set[questionNumber-1];
+
+      restoreFromData(stored_data)
+    } catch(e){
+      console.log(e)
+    }
+  }
+
+  function restoreFromData(data){
+      for (var key in data) {
+        if (!data.hasOwnProperty(key)) continue;
+
+        console.log("restoring", key)
+
+        var s = data[key];
+
+        if(document.getElementById(key))
+          document.getElementById(key).value = s
+      } 
+  }
+
+  function generate(){
+    saveDB()
+
+    generateQuestion(1)
+    generateQuestion(2)
+    generateQuestion(3)
+    generateQuestion(4)
+
+
+    if(document.getElementById("admin_answer1").value == "")
+      document.getElementById("admin_answer1").value = document.getElementById("admin_question4").value
+
+
+    var questionNumber = document.getElementById("question_number").value
+    document.getElementById("show_question_number").innerHTML = questionNumber
+    
+    var rightLetter = data_set[parseInt(questionNumber)-1].correct_answer
+    var a = data_set[parseInt(questionNumber)-1].shuffle
+
+    document.getElementById("right_answer").innerHTML = rightLetter
+
+    generateAnswer(a[0], "A")
+    generateAnswer(a[1], "B")
+    generateAnswer(a[2], "C")
+    generateAnswer(a[3], "D")
+  } 
+
+  function rightLetterFor(questionNumber,a){
+    var random = new Random(questionNumber)
+
+    for(var i = 0; i < 10; i++){
+      var x      = Math.floor(random.nextFloat() * a.length)
+      var x2      = Math.floor(random.nextFloat() * a.length)
+
+      var temp = a[x]
+      a[x]  = a[x2]
+      a[x2] = temp
+    }
+
+
+    return ["A","B","C","D"][a.indexOf(1)]
+  }
+
+  function generateQuestion(num){
+    var encodedScheme = encodeURIComponent(document.getElementById("admin_question"+num).value)
+    var questionUrl = "index.html?startingValue="+encodedScheme+"&hideScheme=true"+(num == 4 ? "&hideAnswer=true" : "")
+    document.getElementById("question" + num).src = questionUrl
+  }
+
+  function generateAnswer(num,letter){
+    var encodedScheme = encodeURIComponent('(above (text "'+letter+'" 24 "black")' + document.getElementById("admin_answer"+num).value + ')')
+
+    var answerUrl = "index.html?startingValue="+encodedScheme+"&hideScheme=true&hideDiagram=true"
+    document.getElementById("answer" + letter).src = answerUrl
+  }
+
+  function Random(seed) {
+    this._seed = seed % 2147483647;
+    if (this._seed <= 0) this._seed += 2147483646;
+  }
+
+  Random.prototype.next = function () {
+    return this._seed = this._seed * 16807 % 2147483647;
+  };
+
+  Random.prototype.nextFloat = function (opt_minOrMax, opt_max) {
+    return (this.next() - 1) / 2147483646;
+  };
+
+  String.prototype.hashCode = function() {
+    var hash = 0, i, chr;
+    if (this.length === 0) return hash;
+    for (i = 0; i < this.length; i++) {
+      chr   = this.charCodeAt(i);
+      hash  = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+  };
+</script>
+
+<h2>Question <span id="show_question_number"></span></h2>
+<div class="questions">
+  <iframe id="question1" ></iframe>
+  <iframe id="question2" ></iframe>
+  <iframe id="question3" ></iframe>
+  <iframe id="question4" ></iframe>
+</div>
+
+<div class="answers">
+  <h2>Choose the missing shape</h2>
+  <div class="answer">
+    <iframe id="answerA"></iframe>
+    </div>
+  <div class="answer">
+    <iframe id="answerB"></iframe>
+  </div>
+  <div class="answer">
+    <iframe id="answerC"></iframe>
+  </div>
+  <div class="answer" >
+    <iframe id="answerD"></iframe>
+  </div>
+</div>
+
+<div style="clear:both"></div>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<div id="export"></div>
+   
+</div>

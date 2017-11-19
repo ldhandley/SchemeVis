@@ -3,8 +3,8 @@ require 'erb'
 
 require "./levels.rb"
 
-aws_access_key_id = 'AKIAIDGOVOANSDVRRO7Q'
-aws_secret_access_key = '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'
+aws_access_key_id = @aws_access_key_id
+aws_secret_access_key = @aws_secret_access_key
 endpoint = 'https://mturk-requester.us-east-1.amazonaws.com'
 region = 'us-east-1'
 
@@ -20,13 +20,13 @@ puts @mturk.get_account_balance[:available_balance]
 @previous_level = "Level-#{@level.split("-")[1].to_i - 1}"
 
 resp1 = @mturk.list_workers_with_qualification_type({
-  qualification_type_id: @levels[@previous_level][:qualification_id_to_award], # required
+  qualification_type_id: @levels[@previous_level]["v1"][:qualification_id_to_award], # required
   status: "Granted", # accepts Granted, Revoked
   max_results: 100,
 })
 
 resp2 = @mturk.list_workers_with_qualification_type({
-  qualification_type_id: @levels[@level][:qualification_id_to_award], # required
+  qualification_type_id: @levels[@level]["v1"][:qualification_id_to_award], # required
   status: "Granted", # accepts Granted, Revoked
   max_results: 100,
 })

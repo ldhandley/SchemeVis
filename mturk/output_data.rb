@@ -2,8 +2,8 @@ require 'aws-sdk'
 require 'json'
 require "./levels.rb"
 
-aws_access_key_id = 'AKIAIDGOVOANSDVRRO7Q'
-aws_secret_access_key = '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'
+aws_access_key_id = @aws_access_key_id
+aws_secret_access_key = @aws_secret_access_key
 endpoint = 'https://mturk-requester.us-east-1.amazonaws.com'
 region = 'us-east-1'
 
@@ -34,7 +34,7 @@ def grade(hit)
 
    return if !hit.question.match(/SchemeVis\/#{@level}\/#{@version}/)
 
-   answer_key = @levels[hit_level][:answers]
+   answer_key = @levels[hit_level][@version][:answers]
 
    assignment_datas = resp.assignments.map do |assignment|
 

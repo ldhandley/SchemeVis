@@ -1,8 +1,9 @@
 require 'aws-sdk'
 require "./levels.rb"
+require "../aws_creds.rb"
 
-aws_access_key_id = 'AKIAIDGOVOANSDVRRO7Q'
-aws_secret_access_key = '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'
+aws_access_key_id = @aws_access_key_id
+aws_secret_access_key = @aws_secret_access_key
 endpoint = 'https://mturk-requester.us-east-1.amazonaws.com'
 region = 'us-east-1'
 
@@ -35,7 +36,9 @@ def grade(hit)
 
    return if !hit_level.match("Level-")
 
-   answer_key = @levels[hit_level][:answers]
+   version = hit.question.match(/s3.amazonaws.com\/thoughtstem.cms.dev\/SchemeVis\/Level-1\/v(\d+)/)[1]
+
+   answer_key = @levels[hit_level][version][:answers]
 
    resp.assignments.each do |assignment| 
      score = grade_assignment(assignment, answer_key)
@@ -47,7 +50,7 @@ def grade(hit)
 
      if( score >= 0.8)
         resp = @mturk.associate_qualification_with_worker({
-          qualification_type_id: @levels[hit_level][:qualification_id_to_award], # required
+          qualification_type_id: @levels[hit_level][version][:qualification_id_to_award], # required
           worker_id: worker_id, # required
           integer_value: score*100,
           send_notification: true,

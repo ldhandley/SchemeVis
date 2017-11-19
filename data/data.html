@@ -32,111 +32,130 @@ body {
 <body>
 <script src="http://d3js.org/d3.v3.min.js"></script>
 
+<div>
+  <input id="desired_level" type="text" onchange="tryVisualize()"></input>
+</div>
+
 <script>
-var margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
 
-/* 
- * value accessor - returns the value to encode for a given data object.
- * scale - maps value to a visual display encoding, such as a pixel position.
- * map function - maps from data value to display value
- * axis - sets up axis
- */ 
+function tryVisualize(){
+  var s = document.getElementById("desired_level").value
 
-// setup x 
-var xValue = function(d) { return d.index + 1;}, // data -> value
-    xScale = d3.scale.linear().range([0, width]), // value -> display
-    xMap = function(d) { return xScale(xValue(d));}, // data -> display
-    xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+  visualize(s.split(" ")[0], s.split(" ")[1])
+}
 
-// setup y
-var yValue = function(d) { return d.percent_correct;}, // data -> value
-    yScale = d3.scale.linear().range([height, 0]), // value -> display
-    yMap = function(d) { return yScale(yValue(d));}, // data -> display
-    yAxis = d3.svg.axis().scale(yScale).orient("left");
+function visualize(level,version){
+  console.log(level, version) 
 
-// setup fill color
-var cValue = function(d) { return 1;},
-    color = d3.scale.category10();
+  var margin = {top: 20, right: 20, bottom: 30, left: 40},
+      width = 960 - margin.left - margin.right,
+      height = 500 - margin.top - margin.bottom;
 
-// add the graph canvas to the body of the webpage
-var svg = d3.select("body").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  /* 
+   * value accessor - returns the value to encode for a given data object.
+   * scale - maps value to a visual display encoding, such as a pixel position.
+   * map function - maps from data value to display value
+   * axis - sets up axis
+   */ 
 
-// add the tooltip area to the webpage
-var tooltip = d3.select("body").append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
+  // setup x 
+  var xValue = function(d) { return d.index + 1;}, // data -> value
+      xScale = d3.scale.linear().range([0, width]), // value -> display
+      xMap = function(d) { return xScale(xValue(d));}, // data -> display
+      xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+
+  // setup y
+  var yValue = function(d) { return d.percent_correct;}, // data -> value
+      yScale = d3.scale.linear().range([height, 0]), // value -> display
+      yMap = function(d) { return yScale(yValue(d));}, // data -> display
+      yAxis = d3.svg.axis().scale(yScale).orient("left");
+
+  // setup fill color
+  var cValue = function(d) { return 1;},
+      color = d3.scale.category10();
+
+  // add the graph canvas to the body of the webpage
+  var svg = d3.select("body").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // add the tooltip area to the webpage
+  var tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
 
 
 
-d3.json("Level-2/v1/questions.json", function(error, questions) {
-  d3.json("Level-2/v1/responses.json", function(error, responses) {
-    questions = questions.map(function(q,qi){
-      var ret = q 
+  d3.json(level + "/" + version + "/questions.json", function(error, questions) {
+    d3.json(level + "/" + version + "/responses.json", function(error, responses) {
+      questions = questions.map(function(q,qi){
+        var ret = q 
 
-      q.percent_correct = getPercentCorrect(q, qi, responses)
-      q.index = qi
+        q.answers = responses.map(function(r){
+          return r.answers[qi]
+        })
 
-      return ret
-    })
+        q.percent_correct = getPercentCorrect(q, qi, responses)
+        q.index = qi
 
-    xScale.domain([0, 10]);
-    yScale.domain([0, 1]);
+        return ret
+      })
 
-    // x-axis
-    svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-      .append("text")
-        .attr("class", "label")
-        .attr("x", width)
-        .attr("y", -6)
-        .style("text-anchor", "end")
-        .text("Question index");
+      xScale.domain([0, 10]);
+      yScale.domain([0, 1]);
 
-    // y-axis
-    svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis)
-      .append("text")
-        .attr("class", "label")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Percent of Workers Answering Correctly");
+      // x-axis
+      svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(xAxis)
+        .append("text")
+          .attr("class", "label")
+          .attr("x", width)
+          .attr("y", -6)
+          .style("text-anchor", "end")
+          .text("Question index");
 
-    // draw dots
-    svg.selectAll(".dot")
-        .data(questions)
-      .enter().append("circle")
-        .attr("class", "dot")
-        .attr("r", 3.5)
-        .attr("cx", xMap)
-        .attr("cy", yMap)
-        .style("fill", function(d) { return color(cValue(d));}) 
-      .on("mouseover", function(d) {
-                tooltip.transition()
-                     .duration(200)
-                     .style("opacity", .9);
-                tooltip.html("<img width='500' src='https://s3.amazonaws.com/thoughtstem.cms.dev/SchemeVis/Level-2/v1/"+(d.index + 1)+".png'></img>")
-                     .style("left", (d3.event.pageX + 5) + "px")
-                     .style("top", (d3.event.pageY - 28) + "px");
-            })
-            .on("mouseout", function(d) {
-                tooltip.transition()
-                     .duration(500)
-                     .style("opacity", 0);
-            });
+      // y-axis
+      svg.append("g")
+          .attr("class", "y axis")
+          .call(yAxis)
+        .append("text")
+          .attr("class", "label")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+          .text("Percent of Workers Answering Correctly");
 
+      // draw dots
+      svg.selectAll(".dot")
+          .data(questions)
+        .enter().append("circle")
+          .attr("class", "dot")
+          .attr("r", 3.5)
+          .attr("cx", xMap)
+          .attr("cy", yMap)
+          .style("fill", function(d) { return color(cValue(d));}) 
+        .on("mouseover", function(d) {
+                  tooltip.transition()
+                       .duration(200)
+                       .style("opacity", .9);
+                  tooltip.html("<div><img width='500' src='https://s3.amazonaws.com/thoughtstem.cms.dev/SchemeVis/"+level + "/" + version + "/" +(d.index + 1)+".png'></img><div>"+d.percent_correct+" " +d.answers.join(",")+"</div></div>")
+                       .style("left", (d3.event.pageX + 5) + "px")
+                       .style("top", (d3.event.pageY - 28) + "px");
+              })
+              .on("mouseout", function(d) {
+                  tooltip.transition()
+                       .duration(500)
+                       .style("opacity", 0);
+              });
+
+    });
   });
-});
+}
 
 function getPercentCorrect(q, qi, responses){
   var correct = responses.filter(function(r){

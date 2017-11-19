@@ -3,8 +3,8 @@ require 'erb'
 
 require "./levels.rb"
 
-aws_access_key_id = 'AKIAIDGOVOANSDVRRO7Q'
-aws_secret_access_key = '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'
+aws_access_key_id = @aws_access_key_id
+aws_secret_access_key = @aws_secret_access_key
 endpoint = 'https://mturk-requester.us-east-1.amazonaws.com'
 region = 'us-east-1'
 
@@ -16,10 +16,11 @@ credentials = Aws::Credentials.new(aws_access_key_id, aws_secret_access_key)
 
 puts @mturk.get_account_balance[:available_balance]
 
-@level = ARGV[0]
+@level   = ARGV[0]
+@version = ARGV[1]
 
 def generate_html(level)
-  @img_url_prefix = @levels[level][:img_url_prefix]
+  @img_url_prefix = @levels[level][@version][:img_url_prefix]
 
   renderer = ERB.new(`cat question_template.html.erb`)
   output = renderer.result()  
@@ -33,16 +34,16 @@ end
 def generate_qualifications(level)
  ret = []
 
- if(@levels[level][:qualification_id_required])
+ if(@levels[level][@version][:qualification_id_required])
     ret << {
-              qualification_type_id: @levels[level][:qualification_id_required], # required
+              qualification_type_id: @levels[level][@version][:qualification_id_required], # required
               comparator: "Exists",
               required_to_preview: true,
             }
  end
 
  ret << {
-          qualification_type_id: @levels[level][:qualification_id_to_award], # required
+          qualification_type_id: @levels[level][@version][:qualification_id_to_award], # required
           comparator: "DoesNotExist",
           required_to_preview: false,
         }
