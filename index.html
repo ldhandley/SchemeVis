@@ -142,7 +142,9 @@ function render(code){
     autounselectify: true,
 
     layout: {
+      fit: true,
       name: 'dagre',
+      boundingBox: {x1: 0, y1: 0, w: 200, h: 200},
       transform: function( node, pos ){ return {x: pos.y, y: pos.x}; }
     },
 
@@ -195,7 +197,7 @@ function makeNodes(lisp){
   var ret = flatten(lisp).map(function(n){
         n.shape = n.type == "identifier" ? "triangle" : "square"
 
-        if(n.type == "literal" && !parseInt(n.value))
+        if(n.type == "literal" && !parseInt(n.value) && n.value != "0")
           n.value = "\"" + n.value + "\"" 
 
         n.backgroundColor = "#11479e"
@@ -592,6 +594,8 @@ function elementsFromScheme(expr){
 
             return ret
         }
+
+       cy.fit(0)
     </script>
   </body>
 </html>

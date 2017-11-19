@@ -1,0 +1,78 @@
+
+
+What things correlate with incorrectness on a problem?
+
+  * Problem number ("Subjective Advancedness", "Fatigue"?)
+
+  * Time spent on puzzles
+
+  * Time since doing previous batch
+
+  
+  Program output metrics (Raphael paper object tree)
+    (Correct answer, 3 wrong answers, 3 hint answers)
+
+  * Big bounding box size
+
+  * Correct answer's index within answers sorted by big bounding box size
+
+  * Variation in child bounding box sizes
+
+
+  Program structure metrics
+  * Circles vs squares vs other ...
+
+  * Number of prompts
+
+  * Number of nodes in graph
+    (Count spaces after removing parens) 
+
+  * Max tree Depth
+    (Count max run of close parens)
+
+  * Tree Breadth
+    (Number of leaf nodes.  Count spaces after removing parens and function tokens)
+
+  * Number of "concepts"/"constructs" used
+  * Number of new "concepts"/"constructs" used
+      * Number or previous problems with same construct/concept
+
+  * Call graph:
+    * Max depth
+    * Branchyness
+    * Has a cycle
+
+
+  * For all program structure metrics:
+     * Variation between prompts
+
+
+  * For all program structure metrics
+     * Difference from previous problem
+
+
+   //Pass in output of math expression
+
+   //Math in functiion
+      //Math in SOME functions, not others
+   
+
+   //Shape in function differs between hints
+
+
+   //Function with a nested expression inside
+
+   //Calling a function twice (e.g. (beside mystery mystery))
+
+   //Function that returns a number
+
+   //Function with two+ params
+
+   //Two different functions mystery1 mystery2
+
+   //Function that calls another function
+      // And so on
+
+  //30
+  {"admin_question1":"(define (mystery x) (circle 50 \"solid\" x)) (mystery \"red\")","admin_question2":"(define (mystery x) (circle 50 \"solid\" x)) (mystery \"orange\")","admin_question3":"(define (mystery x) (circle 50 \"solid\" x)) (mystery \"green\")","admin_question4":"(define (mystery x) (circle 50 \"solid\" x)) (mystery \"blue\")","admin_answer1":"(circle 50 \"solid\" \"blue\")","admin_answer2":"(circle 50 \"solid\" \"yellow\")","admin_answer3":"(circle 50 \"solid\" \"green\")","admin_answer4":"(circle 50 \"solid\" \"purple\")","correct_answer":"B"},
+

@@ -5,11 +5,6 @@
     margin: 0px;
   }
 
-  iframe{
-    border: none; 
-    width: 400px;
-    height: 300px;
-  }
 
   .answer {
     width: 200px;
@@ -18,18 +13,24 @@
     margin-right: 10px;
   }
   .answer iframe{
+    border: none; 
     width: 200px;
     height: 200px;
     float: left;
   }
 
   .questions iframe{
-    border: 3px solid black; 
+    border: 1px solid black; 
+    width: 450px;
+    height: 340px;
+    margin: 2px;
+    display: block;
+    float: left;
   }
 
   .questions{
     float:left;
-    width: 60%;
+    width: 70%;
   }
   .answers{
     float:left;
@@ -63,6 +64,12 @@
 
 
 <script>
+  function imp(){
+    var data = JSON.parse(document.getElementById("import").value)
+
+    restoreFromData(data) 
+  }
+
   function saveDB(){
     var questionNumber = document.getElementById("question_number").value
 
@@ -91,20 +98,23 @@
     try{
       var stored_data = JSON.parse(localStorage.getItem('stored_question'+questionNumber));
 
-      console.log(stored_data)
-
-      for (var key in stored_data) {
-        if (!stored_data.hasOwnProperty(key)) continue;
-
-        console.log("restoring", key)
-
-        var s = stored_data[key];
-
-        document.getElementById(key).value = s
-      } 
+      restoreFromData(stored_data)
     } catch(e){
       console.log(e)
     }
+  }
+
+  function restoreFromData(data){
+      for (var key in data) {
+        if (!data.hasOwnProperty(key)) continue;
+
+        console.log("restoring", key)
+
+        var s = data[key];
+
+        if(document.getElementById(key))
+          document.getElementById(key).value = s
+      } 
   }
 
   function generate(){
@@ -198,7 +208,13 @@
   </div>
 </div>
 
-<div style="clear:both"/>
-<div id="export">
+<div style="clear:both"></div>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<div id="export"></div>
+<input id="import" onchange="imp()"></input>
    
 </div>
