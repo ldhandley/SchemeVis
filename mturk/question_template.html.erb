@@ -8,9 +8,12 @@
 <div class="panel panel-primary"><!-- WARNING: the ids "collapseTrigger" and "instructionBody" are being used to enable expand/collapse feature --><a class="panel-heading" href="javascript:void(0);" id="collapseTrigger"><strong>Survey Instructions</strong> <span class="collapse-text">(Click to expand)</span></a>
 <div class="panel-body" id="instructionBody">
 <ul>
+  <% if @level != "Level-1" %>
+    <li style="color: red">NOTE: This is the <%= @level %> set.  You MUST have completed the Level-<%= @level.split("-")[1].to_i - 1 %> set.  We will reject this HIT if your HIT for the previous set has not been approved.</li>
+  <% end %> 
   <li>There are 10 puzzles below.</li>
   <li>Answer all questions to the best of your ability. Do not submit without answering all questions.</li>
-  <li>We'll only approve HITS with scores of at least&nbsp;50%!</li>
+  <li>We'll only approve HITS with scores of at least&nbsp;70%!</li>
   <li>Some puzzles may require use of pen and paper.</li>
 </ul>
 </div>

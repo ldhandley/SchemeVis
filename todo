@@ -1,15 +1,13 @@
+* We need to deal with people who retake puzzles
+  * Some people who get rejected on first puzzle might retake
+  * We've had some people retake when we forget to give them qualification
 
-Remove API key from github
-
-Analyse Level-1 and Level-2 data
-  Do v2 for Level-1
-    * Launch new hit
-  Do v2 for Level-2
-    * Launch new hit
-
-Check randomness of correct answers
-
-Check correctness of mturk scripts
-
-Launch Level-3 test
+* We should segment out people who have gone in order vs. people who haven't
+  * Add worker previous history into output data structure
+    * For Level-3 output
+      * Did Worker do Level-1? When?
+      * Did Worker do Level-2? When?
+  * Make graph widget for choosing population of workers
+    * Workers who did Level-1,2,3 in order
+    * Workers who did Levels out of order
 

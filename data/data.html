@@ -41,11 +41,11 @@ body {
 function tryVisualize(){
   var s = document.getElementById("desired_level").value
 
-  visualize(s.split(" ")[0], s.split(" ")[1])
+  visualize(s.split(" ")[0], s.split(" ")[1], s.split(" ")[2])
 }
 
-function visualize(level,version){
-  console.log(level, version) 
+function visualize(level,version, skip){
+  console.log(level, version, skip) 
 
   var margin = {top: 20, right: 20, bottom: 30, left: 40},
       width = 960 - margin.left - margin.right,
@@ -89,7 +89,16 @@ function visualize(level,version){
 
 
   d3.json(level + "/" + version + "/questions.json", function(error, questions) {
-    d3.json(level + "/" + version + "/responses.json", function(error, responses) {
+    d3.json("./combined.json", function(error, combined) {
+      window["combined"] = combined
+      responses = combined[level + "/" + version]
+
+      if(skip == "skip") 
+        responses = responses.filter((r)=>!workerDidPrevious(level)(r))
+
+      if(skip == "noskip") 
+        responses = responses.filter((r)=>workerDidPrevious(level)(r))
+
       questions = questions.map(function(q,qi){
         var ret = q 
 
@@ -128,7 +137,7 @@ function visualize(level,version){
           .attr("y", 6)
           .attr("dy", ".71em")
           .style("text-anchor", "end")
-          .text("Percent of Workers Answering Correctly");
+          .text("Percent Correct (n="+(responses.length)+")");
 
       // draw dots
       svg.selectAll(".dot")
@@ -155,6 +164,28 @@ function visualize(level,version){
 
     });
   });
+}
+
+function workerDidPrevious(level){
+   return function(response){
+     var previous = "Level-" + parseInt(level.split("-")[1] - 1)
+
+     if(previous == "Level-0") return true
+
+     for (var key in combined) {
+        if (!combined.hasOwnProperty(key)) continue;
+        if(!key.match(previous)) continue;
+
+        var data_from_previous = combined[key];
+        if(data_from_previous.map(function(d){return d.worker_id}).indexOf(response.worker_id) >= 0){
+          console.log("Found previous work in", key)
+          return true
+        }
+     }
+     
+     console.log("Worker "+ response.worker_id + " had no history.  Should not have done this set.  Filtering out...")
+     return false
+   }
 }
 
 function getPercentCorrect(q, qi, responses){

@@ -1,0 +1,8 @@
+
+Observed question 6 had a low score
+  Hypothesis: Circles are hard
+  Test: v2 has triangles instead
+
+Observed question 10 had a low score
+  Hypothesis: Fatigue?  Concept (math expressions with differing operators across hints) was two questions away from questions with similar concepts
+  Test: Moved question 10 to question 8

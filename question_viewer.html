@@ -48,18 +48,18 @@
   </div>
   <div id="admin_questions">
     <h3>Questions</h3>
-    <input type="text" id="admin_question1"></input>
-    <input type="text" id="admin_question2"></input>
-    <input type="text" id="admin_question3"></input>
-    <input type="text" id="admin_question4"></input>
+    <textarea type="text" id="admin_question1"></textarea>
+    <textarea type="text" id="admin_question2"></textarea>
+    <textarea type="text" id="admin_question3"></textarea>
+    <textarea type="text" id="admin_question4"></textarea>
   </div>
 
   <div id="admin_answers">
     <h3>Answers</h3>
-    <input type="text" id="admin_answer1" ></input>
-    <input type="text" id="admin_answer2"></input>
-    <input type="text" id="admin_answer3"></input>
-    <input type="text" id="admin_answer4"></input>
+    <textarea type="text" id="admin_answer1" ></textarea>
+    <textarea type="text" id="admin_answer2"></textarea>
+    <textarea type="text" id="admin_answer3"></textarea>
+    <textarea type="text" id="admin_answer4"></textarea>
   </div>
   <button id="generate" onclick="generate()">Generate</button>
 </div>
@@ -99,10 +99,11 @@
   function recalculateAnswers(data_set){
 
     data_set.forEach(function(d,i){
-      var hash = JSON.stringify(d).hashCode()
+      var hash = JSON.stringify(d.admin_question4).hashCode()
       console.log(i+1, hash)
       var a = [1,2,3,4]
       var rightLetter = rightLetterFor( hash, a)
+      console.log(rightLetter)
       d.correct_answer = rightLetter
       d.shuffle = a
     })
@@ -177,6 +178,18 @@
     return ["A","B","C","D"][a.indexOf(1)]
   }
 
+  String.prototype.hashCode = function() {
+    var hash = 0, i, chr;
+    if (this.length === 0) return hash;
+    for (i = 0; i < this.length; i++) {
+      chr   = this.charCodeAt(i);
+      hash  = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+  }
+
+
   function generateQuestion(num){
     var encodedScheme = encodeURIComponent(document.getElementById("admin_question"+num).value)
     var questionUrl = "index.html?startingValue="+encodedScheme+"&hideScheme=true"+(num == 4 ? "&hideAnswer=true" : "")
@@ -203,16 +216,6 @@
     return (this.next() - 1) / 2147483646;
   };
 
-  String.prototype.hashCode = function() {
-    var hash = 0, i, chr;
-    if (this.length === 0) return hash;
-    for (i = 0; i < this.length; i++) {
-      chr   = this.charCodeAt(i);
-      hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
-  };
 </script>
 
 <h2>Question <span id="show_question_number"></span></h2>

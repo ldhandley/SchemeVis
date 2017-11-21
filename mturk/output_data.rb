@@ -1,6 +1,7 @@
 require 'aws-sdk'
 require 'json'
 require "./levels.rb"
+require "../aws_creds.rb"
 
 aws_access_key_id = @aws_access_key_id
 aws_secret_access_key = @aws_secret_access_key
@@ -37,7 +38,6 @@ def grade(hit)
    answer_key = @levels[hit_level][@version][:answers]
 
    assignment_datas = resp.assignments.map do |assignment|
-
      worker_id = assignment.worker_id
      worker_answers = assignment.answer.scan(/<QuestionIdentifier>q(\d+)<\/QuestionIdentifier>\n*<FreeText>(.+?)<\/FreeText>/).sort{|a,b| a[0].to_i - b[0].to_i}.map{|a| a[1]}
  
@@ -52,14 +52,12 @@ def grade(hit)
    assignment_datas
 end
 
-def grade_assignment(assignment, answer_key)
-end
-
 resp = @mturk.list_hits({
   max_results: 100,
 })
 
 output = resp.hits.map{|hit| grade(hit)}.select{|x| x}.flatten.to_json
+puts output
 
 File.open("../data/#{@level}/#{@version}/responses.json", 'w') { |file| file.write(output) }
 

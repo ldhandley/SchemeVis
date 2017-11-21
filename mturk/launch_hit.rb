@@ -2,6 +2,7 @@ require 'aws-sdk'
 require 'erb'
 
 require "./levels.rb"
+require "../aws_creds.rb"
 
 aws_access_key_id = @aws_access_key_id
 aws_secret_access_key = @aws_secret_access_key
@@ -34,13 +35,13 @@ end
 def generate_qualifications(level)
  ret = []
 
- if(@levels[level][@version][:qualification_id_required])
-    ret << {
-              qualification_type_id: @levels[level][@version][:qualification_id_required], # required
-              comparator: "Exists",
-              required_to_preview: true,
-            }
- end
+# if(@levels[level][@version][:qualification_id_required])
+#    ret << {
+#              qualification_type_id: @levels[level][@version][:qualification_id_required], # required
+#              comparator: "Exists",
+#              required_to_preview: true,
+#            }
+# end
 
  ret << {
           qualification_type_id: @levels[level][@version][:qualification_id_to_award], # required
@@ -51,17 +52,34 @@ def generate_qualifications(level)
  ret
 end
 
+def generate_review_policy(level)
+    {
+          policy_name:"ScoreMyKnownAnswers/2011-09-01",
+          parameters:[
+            { key:"AnswerKey",
+              map_entries: @levels[level][@version][:answers].map.with_index{|a,i| 
+                  {key: "q#{i+1}", values: [a]}
+                } , # required
+            }, 
+            { key: "ApproveIfKnownAnswerScoreIsAtLeast",
+              values:["70"]
+            }
+          ]
+    }
+end
+
 resp = @mturk.create_hit({
   max_assignments: 20,
   auto_approval_delay_in_seconds: 3*24*60*60, #3 days
   lifetime_in_seconds: 7*24*60*60, # required
   assignment_duration_in_seconds: 60*60, # required
-  reward: "0.1", # required
+  reward: "#{"%0.2f" % (@level.split("-")[1].to_i  * 0.05)}", # required
   title: @level + ": Solve some puzzles" , # required
   keywords: "puzzle, test",
   description: "Solve these puzzles", # required
   question: generate_html(@level),
   qualification_requirements: generate_qualifications(@level),
+  assignment_review_policy: generate_review_policy(@level)
 })
 
 puts resp
